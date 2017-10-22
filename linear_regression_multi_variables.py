@@ -1,34 +1,48 @@
 import tensorflow as tf
-import matplotlib.pyplot as plt
 
-# X and Y data
-X = [1,2,3]
-Y = [1,2,3]
+#x1_data = [73., 93., 89., 96., 73.]
+#x2_data = [80., 88., 91., 98., 66.]
+#x3_data = [75., 93., 90., 100., 70.]
+#y_data = [152., 185., 180., 196., 142.]
 
-W = tf.placeholder(tf.float32)
-# Our hypothesis for linear model X * W
-hypothesis = X * W
+# ==> matrix form
+x_data = [[73., 80., 75.], [93., 88., 93.], [89., 91., 90.], [96., 98., 100.], [73., 66., 70.]]
+y_data = [[152.], [185.], [180.], [196.], [142.]]
 
-# cost/Loss function
-# cost = tf.reduce_mean(tf.square(hypopthesis - y_train))
+# placeholder for a tensor that will be always fed.
+#x1 = tf.placeholder(tf.float32)
+#x2 = tf.placeholder(tf.float32)
+#x3 = tf.placeholder(tf.float32)
+#Y = tf.placeholder(tf.float32)
+
+X = tf.placeholder(tf.float32, shape=[None, 3])
+Y = tf.placeholder(tf.float32, shape=[None, 1])
+
+#w1 = tf.Variable(tf.random_normal([1]), name='weight1')
+#w2 = tf.Variable(tf.random_normal([1]), name='weight2')
+#w3 = tf.Variable(tf.random_normal([1]), name='weight3')
+#b = tf.Variable(tf.random_normal([1]), name='bias')
+
+W = tf.Variable(tf.random_normal([3, 1]), name='weight')
+b = tf.Variable(tf.random_normal([1]), name='bias')
+
+#hypothesis = x1 * w1 + x2 * w2 + x3 * w3 + b
+
+hypothesis = tf.matmul(X, W) + b
+
+# cost/loss funcfion
 cost = tf.reduce_mean(tf.square(hypothesis - Y))
+# Minimize. Need a very small Learning rate for this data set
+optimizer = tf.train.GradientDescentOptimizer(learning_rate=1e-5)
+train = optimizer.minimize(cost)
 
-# Launch the graph in a session.
+# Launch the graph in a session
 sess = tf.Session()
-# Initialize global variables in the graph.
+# Initialize global variables in the graph
 sess.run(tf.global_variables_initializer())
 
-# Variables for plotting cost function
-W_val = []
-cost_val = []
+for step in range(2001):
+    cost_val, hy_val, _ = sess.run([cost, hypothesis, train], feed_dict={X:x_data, Y:y_data})
 
-for i in range(-30, 50):
-    feed_W = i * 0.1
-    curr_cost, curr_W = sess.run([cost, W], feed_dict={W: feed_W})
-    W_val.append(curr_W)
-    cost_val.append(curr_cost)
-
-# Show the cost function
-plt.plot(W_val, cost_val)
-plt.show()
-
+    if(step % 10) == 0:
+        print(step, "Cost: ", cost_val, "\nPrediction:\n", hy_val)

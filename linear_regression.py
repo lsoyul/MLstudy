@@ -41,3 +41,4 @@ for step in range(5000):
     if(step % 20) == 0:
         print(step, cost_val, W_val, b_val)
 
+
